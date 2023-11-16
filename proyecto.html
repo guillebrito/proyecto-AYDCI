@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Jorge Scandaliaris">
+
+<title>Análisis comparativo de la implementación de varios multiplicadores</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="proyecto_files/libs/clipboard/clipboard.min.js"></script>
+<script src="proyecto_files/libs/quarto-html/quarto.js"></script>
+<script src="proyecto_files/libs/quarto-html/popper.min.js"></script>
+<script src="proyecto_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="proyecto_files/libs/quarto-html/anchor.min.js"></script>
+<link href="proyecto_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="proyecto_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="proyecto_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="proyecto_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="proyecto_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Análisis comparativo de la implementación de varios multiplicadores</h1>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Autor/a</div>
+  <div class="quarto-title-meta-heading">Afiliación</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Jorge Scandaliaris </p>
+  </div>
+    <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Análisis y diseño de circuitos integrados
+          </p>
+      </div>
+    </div>
+
+<div class="quarto-title-meta">
+
+      
+    <div>
+    <div class="quarto-title-meta-heading">Fecha de publicación</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">10 de noviembre de 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="introducción" class="level1">
+<h1>Introducción</h1>
+<p>Existen muchos circuitos para la multiplicación. Cada uno tiene un balance diferente entre velocidad (performance) y cantidad de lógica (costo). Para el proyecto trabajaremos con algunas variantes de multiplicadores y comparararemos sus implementaciones en términos de área, velocidad y complejidad. Exploraremos algunas opciones para manipular el tipo de implementación a nivel del código HDL y también mediante opciones pasadas a las herramientas.</p>
+<section id="multiplicador-binario-secuencial" class="level2">
+<h2 class="anchored" data-anchor-id="multiplicador-binario-secuencial">Multiplicador binario secuencial</h2>
+<p>La multiplicación de números binarios positivos requiere solamente desplazamientos (la operación de desplazamiento a derecha/izquierda equivale dividir/multiplicar por potencias de dos, que justemente coincide con los pesos de los dígitos en un número) y sumas.</p>
+<section id="multiplicador-binario-secuencial-de-4-bits" class="level3">
+<h3 class="anchored" data-anchor-id="multiplicador-binario-secuencial-de-4-bits">Multiplicador binario secuencial de 4 bits</h3>
+<p>La multiplicación de dos números de 4 bits requiere un registro multiplicando de 4 bits, un registro multiplicador de 4 bits y un registro producto de 8 bits. El registro producto sirve como acumulador para acumular la suma de los productos parciales. En lugar de desplazar el multiplicando hacia la izquierda cada vez antes de sumarlo es más conveniente desplazar el registro producto hacia la derecha. La figura <a href="#fig-diag_bloques_mult_secuencial">Figura&nbsp;1</a> muestra un diagrama de bloques para dicho multiplicador.</p>
+<div id="fig-diag_bloques_mult_secuencial" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="images/multiplicador_secuencial_diagrama.png" class="img-fluid figure-img" style="width:70.0%"></p>
+<figcaption class="figure-caption">Figura&nbsp;1: Diagrama en bloques del multiplicador secuencial de 4 bits</figcaption>
+</figure>
+</div>
+<p>Como lo indican las flechas en el diagrama, 4 bits del acumulador y 4 bits del registro multiplicando están conectados a las entradas del sumador; los 4 bits de suma y la salida de acarreo del sumador se conectan nuevamente al acumulador. El sumador calcula la suma de sus entradas, y cuando ocurre una señal de suma (<em>Ad</em>), las salidas del sumador se almacenan en el acumulador en el siguiente flanco ascendente del reloj, lo que provoca que el multiplicando se agregue al acumulador. Un bit adicional en el extremo izquierdo del registro de producto almacena temporalmente cualquier acarreo (<em>C4</em>) que se genere cuando se agrega el multiplicando al acumulador. Tenga en cuenta que cuando <em>ACC</em> se desplaza hacia la derecha, la entrada al bit 8 de <em>ACC</em> debe ser 0. Entonces un desplazamiento desplazará el valor correcto al bit 7 de <em>ACC</em>. Debido a que los cuatro bits inferiores del registro de producto inicialmente no se utilizan, almacenaremos el multiplicador en esta ubicación en lugar de en un registro separado. A medida que se utiliza cada bit multiplicador, se descarta por el extremo derecho el registro para dejar espacio para bits de producto adicionales. La señal <em>Load</em> carga el multiplicador en los cuatro bits inferiores de <em>ACC</em> y al mismo tiempo borra los 5 bits superiores. La señal de desplazamiento (<em>Sh</em>) hace que el contenido del registro de producto (incluido el multiplicador) se desplace un lugar hacia la derecha cuando se produce el siguiente flanco ascendente del reloj. El circuito de control emite la secuencia adecuada de señales de adición y desplazamiento después de que se ha recibido una señal de inicio, <span class="math inline">\(St = 1\)</span>. Si el bit multiplicador actual (<em>M</em>) es 1, el multiplicando se suma al acumulador seguido de un desplazamiento a la derecha; si el bit multiplicador es 0, la suma se omite y sólo se produce el desplazamiento a la derecha. El ejemplo de multiplicación al comienzo de esta sección (13 × 11) se reelabora a continuación, <a href="#lst-contenido_registros">Listado&nbsp;1</a> , donde se muestra el contenido de los los registros en cada ciclo de reloj.</p>
+<div id="lst-contenido_registros" class="listing">
+<p>Listado&nbsp;1: Contenido de los registros en cada ciclo de reloj</p>
+<pre id="lst-contenido_registros" data-lst-cap="Contenido de los registros en cada ciclo de reloj"><code>                                     A  C  U  M  U  L  A  D  O  R 
+                                      b8 b7 b6 b5 b4 b3 b2 b1 b0
+contenido inicial registro acumulador  0  0  0  0  0  1  0  1  1  &lt;-M (11)
+agrega multiplicando porque M = 1         1  1  0  1                  (13)
+                                       -------------------------
+despues de suma                        0  1  1  0  1  1  0  1  1    
+despues de desplazamiento              0  0  1  1  0  1  1  0  1  &lt;-M
+agrega multiplicando porque M = 1         1  1  0  1 
+                                       -------------------------
+despues de suma                        1  0  0  1  1  1  1  0  1
+despues de desplazamiento              0  1  0  0  1  1  1  1  0  &lt;-M
+saltea suma porque M = 0              
+despues de desplazamiento              0  0  1  0  0  1  1  1  1  &lt;-M
+agrega multiplicando porque M = 1         1  1  0  1
+                                       -------------------------
+despues de suma                        1  0  0  0  1  1  1  1  1
+despues de desplazamiento              0  1  0  0  0  1  1  1  1      (143)</code></pre>
+</div>
+<p>El circuito de control debe diseñarse para generar la secuencia adecuada de señales de adición y desplazamiento. La figura <a href="#fig-controlador_4x4">Figura&nbsp;2</a> muestra un diagrama de estados del circuito de control. La notación utilizada siguiente: <em>M/Ad</em> significa que si <span class="math inline">\(M = 1\)</span>, entonces la salida <em>Ad</em> es 1 (y las otras salidas son 0). <em>M’/Sh</em> significa que si <span class="math inline">\(M' = 1\)</span>, (<span class="math inline">\(M = 0\)</span>), entonces la salida <em>Sh</em> es 1 (y las otras salidas son 0). <span class="math inline">\(S_0\)</span> es el estado de reinicio y el circuito permanece en <span class="math inline">\(S_0\)</span> hasta que se recibe una señal de inicio (<span class="math inline">\(St = 1\)</span>). Esto genera una señal de carga, <em>Load</em>, que hace que el multiplicador se cargue en los 4 bits inferiores del acumulador (<em>ACC</em>) y que los 5 bits superiores de <em>ACC</em> se borren en el siguiente flanco ascendente del reloj. En el estado <span class="math inline">\(S_1\)</span>, se prueba el bit menos significativo del multiplicador (<em>M</em>). Si <span class="math inline">\(M = 1\)</span>, se genera una señal de suma y, luego, se genera una señal de desplazamiento en <span class="math inline">\(S_2\)</span>. Si <em>M</em> = 0 en <span class="math inline">\(S_1\)</span>, se genera una señal de desplazamiento porque se puede omitir la adición de 0. De manera similar, en los estados <span class="math inline">\(S_3\)</span>, <span class="math inline">\(S_5\)</span> y <span class="math inline">\(S_7\)</span>, se verifica <em>M</em> para determinar si se debe generar una señal de suma seguida de un desplazamiento o simplemente una señal de desplazamiento. Siempre se genera una señal de desplazamiento en el siguiente ciclo de reloj después de una señal de suma (estados <span class="math inline">\(S_2\)</span>, <span class="math inline">\(S_4\)</span>, <span class="math inline">\(S_6\)</span> y <span class="math inline">\(S_8\)</span>). Después de que se hayan generado cuatro desplazamientos, se han procesado los cuatro bits multiplicadores y el circuito de control pasa al estado <em>Done</em> y finaliza el proceso de multiplicación.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-controlador_4x4" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<div>
+<svg width="672" height="480" viewbox="0.00 0.00 560.52 482.47" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 478.47)">
+<title>
+mef
+</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-478.47 556.52,-478.47 556.52,4 -4,4"></polygon> <!-- root --> <!-- S9 --> <g id="node2" class="node">
+<title>
+S9
+</title>
+<ellipse fill="none" stroke="black" cx="434.19" cy="-303.98" rx="21.47" ry="21.47"></ellipse> <text text-anchor="middle" x="434.19" y="-299.78" font-family="Times,serif" font-size="14.00">S9</text> </g> <!-- root&#45;&gt;S9 --> <!-- S8 --> <g id="node3" class="node">
+<title>
+S8
+</title>
+<ellipse fill="none" stroke="black" cx="355.73" cy="-411.98" rx="21.47" ry="21.47"></ellipse> <text text-anchor="middle" x="355.73" y="-407.78" font-family="Times,serif" font-size="14.00">S8</text> </g> <!-- root&#45;&gt;S8 --> <!-- S7 --> <g id="node4" class="node">
+<title>
+S7
+</title>
+<ellipse fill="none" stroke="black" cx="228.77" cy="-453.24" rx="21.47" ry="21.47"></ellipse> <text text-anchor="middle" x="228.77" y="-449.04" font-family="Times,serif" font-size="14.00">S7</text> </g> <!-- root&#45;&gt;S7 --> <!-- S6 --> <g id="node5" class="node">
+<title>
+S6
+</title>
+<ellipse fill="none" stroke="black" cx="101.8" cy="-411.98" rx="21.47" ry="21.47"></ellipse> <text text-anchor="middle" x="101.8" y="-407.78" font-family="Times,serif" font-size="14.00">S6</text> </g> <!-- root&#45;&gt;S6 --> <!-- S5 --> <g id="node6" class="node">
+<title>
+S5
+</title>
+<ellipse fill="none" stroke="black" cx="23.34" cy="-303.98" rx="21.47" ry="21.47"></ellipse> <text text-anchor="middle" x="23.34" y="-299.78" font-family="Times,serif" font-size="14.00">S5</text> </g> <!-- root&#45;&gt;S5 --> <!-- S4 --> <g id="node7" class="node">
+<title>
+S4
+</title>
+<ellipse fill="none" stroke="black" cx="23.34" cy="-170.49" rx="21.47" ry="21.47"></ellipse> <text text-anchor="middle" x="23.34" y="-166.29" font-family="Times,serif" font-size="14.00">S4</text> </g> <!-- root&#45;&gt;S4 --> <!-- S3 --> <g id="node8" class="node">
+<title>
+S3
+</title>
+<ellipse fill="none" stroke="black" cx="101.8" cy="-62.49" rx="21.47" ry="21.47"></ellipse> <text text-anchor="middle" x="101.8" y="-58.29" font-family="Times,serif" font-size="14.00">S3</text> </g> <!-- root&#45;&gt;S3 --> <!-- S2 --> <g id="node9" class="node">
+<title>
+S2
+</title>
+<ellipse fill="none" stroke="black" cx="228.77" cy="-21.24" rx="21.47" ry="21.47"></ellipse> <text text-anchor="middle" x="228.77" y="-17.04" font-family="Times,serif" font-size="14.00">S2</text> </g> <!-- root&#45;&gt;S2 --> <!-- S1 --> <g id="node10" class="node">
+<title>
+S1
+</title>
+<ellipse fill="none" stroke="black" cx="355.73" cy="-62.49" rx="21.47" ry="21.47"></ellipse> <text text-anchor="middle" x="355.73" y="-58.29" font-family="Times,serif" font-size="14.00">S1</text> </g> <!-- root&#45;&gt;S1 --> <!-- S0 --> <g id="node11" class="node">
+<title>
+S0
+</title>
+<ellipse fill="none" stroke="black" cx="434.19" cy="-170.49" rx="21.47" ry="21.47"></ellipse> <text text-anchor="middle" x="434.19" y="-166.29" font-family="Times,serif" font-size="14.00">S0</text> </g> <!-- root&#45;&gt;S0 --> <!-- S9&#45;&gt;S0 --> <g id="edge25" class="edge">
+<title>
+S9-&gt;S0
+</title>
+<path fill="none" stroke="black" d="M434.19,-282.54C434.19,-260.74 434.19,-226.74 434.19,-201.9"></path> <polygon fill="black" stroke="black" points="437.69,-201.88 434.19,-191.88 430.69,-201.88 437.69,-201.88"></polygon> <text text-anchor="middle" x="414.76" y="-246.42" font-family="Times,serif" font-size="14.00">-/Done</text> </g> <!-- S8&#45;&gt;S9 --> <g id="edge24" class="edge">
+<title>
+S8-&gt;S9
+</title>
+<path fill="none" stroke="black" d="M368.33,-394.63C381.15,-377 401.13,-349.49 415.73,-329.4"></path> <polygon fill="black" stroke="black" points="418.57,-331.44 421.62,-321.29 412.91,-327.33 418.57,-331.44"></polygon> <text text-anchor="middle" x="380.36" y="-366.21" font-family="Times,serif" font-size="14.00">-/Sh</text> </g> <!-- S7&#45;&gt;S9 --> <g id="edge23" class="edge">
+<title>
+S7-&gt;S9
+</title>
+<path fill="none" stroke="black" d="M246.28,-440.51C282.68,-414.06 366.63,-353.07 408.9,-322.36"></path> <polygon fill="black" stroke="black" points="410.98,-325.18 417.01,-316.47 406.87,-319.51 410.98,-325.18"></polygon> <text text-anchor="middle" x="310.77" y="-385.64" font-family="Times,serif" font-size="14.00">M’/Sh</text> </g> <!-- S7&#45;&gt;S8 --> <g id="edge22" class="edge">
+<title>
+S7-&gt;S8
+</title>
+<path fill="none" stroke="black" d="M249.16,-446.61C269.9,-439.87 302.23,-429.36 325.85,-421.69"></path> <polygon fill="black" stroke="black" points="326.95,-425.01 335.38,-418.59 324.79,-418.36 326.95,-425.01"></polygon> <text text-anchor="middle" x="270.78" y="-438.35" font-family="Times,serif" font-size="14.00">M/Ad</text> </g> <!-- S6&#45;&gt;S7 --> <g id="edge21" class="edge">
+<title>
+S6-&gt;S7
+</title>
+<path fill="none" stroke="black" d="M122.2,-418.61C142.93,-425.35 175.27,-435.85 198.89,-443.53"></path> <polygon fill="black" stroke="black" points="197.83,-446.86 208.42,-446.62 199.99,-440.21 197.83,-446.86"></polygon> <text text-anchor="middle" x="148.88" y="-435.27" font-family="Times,serif" font-size="14.00">-/Sh</text> </g> <!-- S5&#45;&gt;S7 --> <g id="edge20" class="edge">
+<title>
+S5-&gt;S7
+</title>
+<path fill="none" stroke="black" d="M40.85,-316.71C77.25,-343.16 161.2,-404.14 203.47,-434.86"></path> <polygon fill="black" stroke="black" points="201.44,-437.71 211.59,-440.75 205.55,-432.04 201.44,-437.71"></polygon> <text text-anchor="middle" x="105.34" y="-363.18" font-family="Times,serif" font-size="14.00">M’/Sh</text> </g> <!-- S5&#45;&gt;S6 --> <g id="edge19" class="edge">
+<title>
+S5-&gt;S6
+</title>
+<path fill="none" stroke="black" d="M35.94,-321.34C48.76,-338.97 68.74,-366.48 83.34,-386.57"></path> <polygon fill="black" stroke="black" points="80.52,-388.64 89.23,-394.67 86.18,-384.53 80.52,-388.64"></polygon> <text text-anchor="middle" x="42.92" y="-358.15" font-family="Times,serif" font-size="14.00">M/Ad</text> </g> <!-- S4&#45;&gt;S5 --> <g id="edge18" class="edge">
+<title>
+S4-&gt;S5
+</title>
+<path fill="none" stroke="black" d="M23.34,-191.94C23.34,-213.73 23.34,-247.74 23.34,-272.57"></path> <polygon fill="black" stroke="black" points="19.84,-272.59 23.34,-282.59 26.84,-272.59 19.84,-272.59"></polygon> <text text-anchor="middle" x="11.67" y="-236.45" font-family="Times,serif" font-size="14.00">-/Sh</text> </g> <!-- S3&#45;&gt;S5 --> <g id="edge17" class="edge">
+<title>
+S3-&gt;S5
+</title>
+<path fill="none" stroke="black" d="M95.11,-83.08C81.21,-125.87 49.15,-224.55 33,-274.25"></path> <polygon fill="black" stroke="black" points="29.66,-273.19 29.9,-283.79 36.32,-275.36 29.66,-273.19"></polygon> <text text-anchor="middle" x="80.88" y="-182.86" font-family="Times,serif" font-size="14.00">M’/Sh</text> </g> <!-- S3&#45;&gt;S4 --> <g id="edge16" class="edge">
+<title>
+S3-&gt;S4
+</title>
+<path fill="none" stroke="black" d="M89.2,-79.84C76.39,-97.47 56.4,-124.98 41.8,-145.07"></path> <polygon fill="black" stroke="black" points="38.96,-143.03 35.91,-153.18 44.62,-147.15 38.96,-143.03"></polygon> <text text-anchor="middle" x="48.78" y="-116.66" font-family="Times,serif" font-size="14.00">M/Ad</text> </g> <!-- S2&#45;&gt;S3 --> <g id="edge15" class="edge">
+<title>
+S2-&gt;S3
+</title>
+<path fill="none" stroke="black" d="M208.37,-27.86C187.64,-34.6 155.3,-45.11 131.68,-52.78"></path> <polygon fill="black" stroke="black" points="130.58,-49.46 122.15,-55.88 132.74,-56.12 130.58,-49.46"></polygon> <text text-anchor="middle" x="158.36" y="-44.52" font-family="Times,serif" font-size="14.00">-/Sh</text> </g> <!-- S1&#45;&gt;S3 --> <g id="edge14" class="edge">
+<title>
+S1-&gt;S3
+</title>
+<path fill="none" stroke="black" d="M334.08,-62.49C289.08,-62.49 185.32,-62.49 133.07,-62.49"></path> <polygon fill="black" stroke="black" points="133.04,-58.99 123.04,-62.49 133.04,-65.99 133.04,-58.99"></polygon> <text text-anchor="middle" x="216.75" y="-66.69" font-family="Times,serif" font-size="14.00">M’/Sh</text> </g> <!-- S1&#45;&gt;S2 --> <g id="edge13" class="edge">
+<title>
+S1-&gt;S2
+</title>
+<path fill="none" stroke="black" d="M335.33,-55.86C314.6,-49.12 282.26,-38.62 258.64,-30.94"></path> <polygon fill="black" stroke="black" points="259.71,-27.61 249.11,-27.85 257.54,-34.27 259.71,-27.61"></polygon> <text text-anchor="middle" x="280.26" y="-47.6" font-family="Times,serif" font-size="14.00">M/Ad</text> </g> <!-- S0&#45;&gt;S1 --> <g id="edge12" class="edge">
+<title>
+S0-&gt;S1
+</title>
+<path fill="none" stroke="black" d="M421.59,-153.14C408.77,-135.5 388.79,-107.99 374.19,-87.9"></path> <polygon fill="black" stroke="black" points="377.01,-85.83 368.3,-79.8 371.35,-89.94 377.01,-85.83"></polygon> <text text-anchor="middle" x="375.72" y="-124.72" font-family="Times,serif" font-size="14.00">St/Load</text> </g> <!-- S0&#45;&gt;S0 --> <g id="edge11" class="edge">
+<title>
+S0-&gt;S0
+</title>
+<path fill="none" stroke="black" d="M450.23,-184.43C482.77,-205.65 527.43,-201 527.43,-170.49 527.43,-142.71 490.43,-136.37 459.25,-151.45"></path> <polygon fill="black" stroke="black" points="457.22,-148.58 450.23,-156.54 460.66,-154.67 457.22,-148.58"></polygon> <text text-anchor="middle" x="539.97" y="-166.29" font-family="Times,serif" font-size="14.00">St’/0</text> </g> </g>
+</svg>
+</div>
+<figcaption class="figure-caption">Figura&nbsp;2: Diagrama de estado del control para un multiplicador de 4 bits</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Tenga en cuenta que la señal <em>Done</em> no se puede activar en el estado <span class="math inline">\(S_7\)</span> o <span class="math inline">\(S_8\)</span> porque el último desplazamiento no ocurre hasta el siguiente flanco de reloj. El último desplazamiento se produce al mismo tiempo que se produce la transición al estado <span class="math inline">\(S_9\)</span>. La señal de control <em>Sh</em> permite que se produzca el desplazamiento en el siguiente flanco ascendente del reloj, pero, por sí sola, no provoca que se produzca el desplazamiento. En general, si una señal de control se activa en el estado <span class="math inline">\(S_n\)</span>, la acción resultante no ocurre hasta que el siguiente flanco de reloj activo lleva al circuito al siguiente estado. El estado <span class="math inline">\(S_9\)</span> podría eliminarse si fuera aceptable activar la señal <em>Done</em> en el estado <span class="math inline">\(S_0\)</span> cuando <span class="math inline">\(St = 0\)</span>. Como indica el diagrama de estado, el control realiza dos funciones: generar señales de adición o desplazamiento según sea necesario y contar el número de bits. Si el número de bits es grande, es conveniente dividir el circuito de control en un contador y un control de suma-desplazamiento, como se muestra en la figura <a href="#fig-controlador_contador">Figura&nbsp;3</a>.</p>
+<div id="fig-controlador_contador" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="images/multiplicador_secuencial_factorizado_diagrama.png" class="img-fluid figure-img" style="width:50.0%"></p>
+<figcaption class="figure-caption">Figura&nbsp;3: Controlador para el multiplicador secuencial factorizando la cuenta de bits en un contador</figcaption>
+</figure>
+</div>
+<!-- Primero, derivaremos un diagrama de estado para el control de adición y desplazamiento que verifica *M* y *St* y genera la secuencia adecuada de señales de adición y desplazamiento @fig-controlador_contador(b). Luego, agregaremos una señal de finalización (*K*) del contador que detiene el multiplicador después de que se haya completado la cantidad adecuada de bits. Comenzando en $S_0$ en la Figura @fig-controlador_contador(b), cuando se recibe una señal de inicio (St = 1), se genera una señal de carga. En el estado $S_1$, si *M* = 0, se genera una señal de desplazamiento y el circuito permanece en $S_1$. Si *M* = 1, se genera una señal de suma y el circuito pasa al estado $S_2$. En $S_2$ se genera una señal de desplazamiento porque un desplazamiento siempre sigue a una adición. De vuelta en $S_1$, se prueba el siguiente bit multiplicador (*M*) para determinar si se debe desplazar o sumar y luego desplazar. El diagrama de la figura @fig-controlador_contador(b) generará la secuencia adecuada de señales de suma y desplazamiento, pero no tiene ninguna disposición para detener el multiplicador.   -->
+<p>El diagrama de estado del control de suma y desplazamiento se muestra en la figura <a href="#fig-diagrama_controlador_factorizado">Figura&nbsp;4</a>. Para determinar cuándo se completa la multiplicación, el contador se incrementa en el flanco del reloj activo cada vez que se genera una señal de desplazamiento. Si el multiplicador es de n bits, se requieren un total de n desplazamientos. Diseñaremos el contador de modo que se genere una señal de finalización (<em>K</em>) después de que hayan ocurrido <span class="math inline">\(n – 1\)</span> desplazamientos. Cuando <span class="math inline">\(K = 1\)</span>, el circuito debe realizar una suma más si es necesario y luego hacer el desplazamiento final. <!-- La operación de control en la Figura @fig-controlador_contador es la misma que la de la Figura @fig-diagrama_controlador_factorizado, siempre que $K = 0$.  --> Comenzando en <span class="math inline">\(S_0\)</span>, cuando se recibe una señal de inicio (<span class="math inline">\(St = 1\)</span>), se genera una señal de carga. En el estado <span class="math inline">\(S_1\)</span>, si <em>K</em> y <em>M</em> son ambos 0 (<span class="math inline">\(K'M'=1\)</span>) se genera una señal de desplazamiento y el circuito permanece en <span class="math inline">\(S_1\)</span> (<span class="math inline">\(M=0\)</span> implica que no es necesario realizar la adición y <span class="math inline">\(K=0\)</span> implica que faltan productos parciales que procesar). Si <em>M</em> = 1, se genera una señal de suma y el circuito pasa al estado <span class="math inline">\(S_2\)</span> (en el estado <em>S2</em> se genera el desplazamiento). El último caso en <em>S1</em> es que <span class="math inline">\(M=0\)</span> y <span class="math inline">\(K=1\)</span>, no debe sumarse el producto parcial y no quedan más productos parciales que procesar. Se transiciona a <em>S3</em> generando el último desplazamiento. En <span class="math inline">\(S_2\)</span> se genera una señal de desplazamiento porque un desplazamiento siempre sigue a una adición, pero dependiendo de <em>K</em> se transiciona a <em>S1</em>, si <span class="math inline">\(K=0\)</span>, o a <em>S3</em> si <span class="math inline">\(K=1\)</span>. La transición a <em>S1</em> implica que todavía quedan productos parciales pendientes, la transición a <em>S3</em> realiza el útimo desplazamiento. La última señal de desplazamiento restablecerá el contador a 0 (el contador debe estar diseñado para pasar de la cuenta n-1 a 0) al mismo tiempo que se activa la salida <em>Done</em>. <!-- Como ejemplo, considere el multiplicador de la Figura @fig-diag_bloques_mult_secuencial, pero reemplace el circuito de control con la Figura @fig-controlador_contador(a). Como n = 4, se necesita un contador de 2 bits y $K = 1$ cuando el contador está en el estado 3 ($11_2$). La Tabla @fig-tabla_operacion muestra la operación del multiplicador cuando 1101 se multiplica por 1011. $S_0$, $S_1$ y $S_2$ representan estados del circuito de control (Figura @fig-controlador_contador(c)). El contenido del registro de producto en cada paso es el mismo que se indica en la p. 635. --></p>
+<div class="cell" data-fig-height="3" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-diagrama_controlador_factorizado" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<div>
+<svg width="672" height="288" viewbox="0.00 0.00 379.95 266.61" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 262.61)">
+<title>
+mef
+</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-262.61 375.95,-262.61 375.95,4 -4,4"></polygon> <!-- root --> <!-- S0 --> <g id="node2" class="node">
+<title>
+S0
+</title>
+<ellipse fill="none" stroke="black" cx="232.43" cy="-231.07" rx="21.47" ry="21.47"></ellipse> <text text-anchor="middle" x="232.43" y="-226.87" font-family="Times,serif" font-size="14.00">S0</text> </g> <!-- root&#45;&gt;S0 --> <!-- S3 --> <g id="node3" class="node">
+<title>
+S3
+</title>
+<ellipse fill="none" stroke="black" cx="28.79" cy="-231.07" rx="21.47" ry="21.47"></ellipse> <text text-anchor="middle" x="28.79" y="-226.87" font-family="Times,serif" font-size="14.00">S3</text> </g> <!-- root&#45;&gt;S3 --> <!-- S2 --> <g id="node4" class="node">
+<title>
+S2
+</title>
+<ellipse fill="none" stroke="black" cx="28.79" cy="-27.42" rx="21.47" ry="21.47"></ellipse> <text text-anchor="middle" x="28.79" y="-23.22" font-family="Times,serif" font-size="14.00">S2</text> </g> <!-- root&#45;&gt;S2 --> <!-- S1 --> <g id="node5" class="node">
+<title>
+S1
+</title>
+<ellipse fill="none" stroke="black" cx="232.43" cy="-27.42" rx="21.47" ry="21.47"></ellipse> <text text-anchor="middle" x="232.43" y="-23.22" font-family="Times,serif" font-size="14.00">S1</text> </g> <!-- root&#45;&gt;S1 --> <!-- S0&#45;&gt;S0 --> <g id="edge5" class="edge">
+<title>
+S0-&gt;S0
+</title>
+<path fill="none" stroke="black" d="M248.47,-245.02C281.01,-266.24 325.67,-261.59 325.67,-231.07 325.67,-203.3 288.67,-196.95 257.49,-212.03"></path> <polygon fill="black" stroke="black" points="255.46,-209.16 248.47,-217.12 258.9,-215.26 255.46,-209.16"></polygon> <text text-anchor="middle" x="338.21" y="-226.87" font-family="Times,serif" font-size="14.00">St’/0</text> </g> <!-- S0&#45;&gt;S1 --> <g id="edge6" class="edge">
+<title>
+S0-&gt;S1
+</title>
+<path fill="none" stroke="black" d="M232.43,-209.66C232.43,-173.68 232.43,-100.92 232.43,-59.04"></path> <polygon fill="black" stroke="black" points="235.93,-58.85 232.43,-48.85 228.93,-58.85 235.93,-58.85"></polygon> <text text-anchor="middle" x="210.27" y="-138.55" font-family="Times,serif" font-size="14.00">St/Load</text> </g> <!-- S3&#45;&gt;S0 --> <g id="edge12" class="edge">
+<title>
+S3-&gt;S0
+</title>
+<path fill="none" stroke="black" d="M50.2,-231.07C86.18,-231.07 158.93,-231.07 200.81,-231.07"></path> <polygon fill="black" stroke="black" points="201.01,-234.57 211.01,-231.07 201.01,-227.57 201.01,-234.57"></polygon> <text text-anchor="middle" x="106.07" y="-235.27" font-family="Times,serif" font-size="14.00">-/Done</text> </g> <!-- S2&#45;&gt;S3 --> <g id="edge11" class="edge">
+<title>
+S2-&gt;S3
+</title>
+<path fill="none" stroke="black" d="M28.79,-48.83C28.79,-84.81 28.79,-157.57 28.79,-199.45"></path> <polygon fill="black" stroke="black" points="25.29,-199.64 28.79,-209.64 32.29,-199.64 25.29,-199.64"></polygon> <text text-anchor="middle" x="14.39" y="-128.34" font-family="Times,serif" font-size="14.00">K/Sh</text> </g> <!-- S2&#45;&gt;S1 --> <g id="edge10" class="edge">
+<title>
+S2-&gt;S1
+</title>
+<path fill="none" stroke="black" d="M44.09,-42.52C79.04,-57.2 164.98,-58.3 207.62,-45.84"></path> <polygon fill="black" stroke="black" points="208.94,-49.08 217.23,-42.48 206.63,-42.47 208.94,-49.08"></polygon> <text text-anchor="middle" x="110.2" y="-48.38" font-family="Times,serif" font-size="14.00">K’/Sh</text> </g> <!-- S1&#45;&gt;S3 --> <g id="edge9" class="edge">
+<title>
+S1-&gt;S3
+</title>
+<path fill="none" stroke="black" d="M217.13,-42.73C181.51,-78.35 92.95,-166.91 51.22,-208.64"></path> <polygon fill="black" stroke="black" points="48.59,-206.32 43.99,-215.86 53.54,-211.27 48.59,-206.32"></polygon> <text text-anchor="middle" x="156.05" y="-129.89" font-family="Times,serif" font-size="14.00">KM’/Sh</text> </g> <!-- S1&#45;&gt;S2 --> <g id="edge8" class="edge">
+<title>
+S1-&gt;S2
+</title>
+<path fill="none" stroke="black" d="M217.13,-12.33C182.18,2.35 96.24,3.45 53.6,-9.01"></path> <polygon fill="black" stroke="black" points="52.28,-5.77 43.99,-12.37 54.59,-12.38 52.28,-5.77"></polygon> <text text-anchor="middle" x="118.64" y="-14.87" font-family="Times,serif" font-size="14.00">M/Ad</text> </g> <!-- S1&#45;&gt;S1 --> <g id="edge7" class="edge">
+<title>
+S1-&gt;S1
+</title>
+<path fill="none" stroke="black" d="M248.47,-41.37C281.01,-62.59 325.67,-57.94 325.67,-27.42 325.67,0.35 288.67,6.7 257.49,-8.39"></path> <polygon fill="black" stroke="black" points="255.46,-5.51 248.47,-13.48 258.9,-11.61 255.46,-5.51"></polygon> <text text-anchor="middle" x="348.81" y="-23.22" font-family="Times,serif" font-size="14.00">K’M’/Sh</text> </g> </g>
+</svg>
+</div>
+<figcaption class="figure-caption">Figura&nbsp;4: Diagrama de estado del control de suma y desplazamiento</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<!-- En el momento $t_0$ el control se reinicia y espera una señal de inicio. En el momento $t_1$, se genera la señal de inicio $St = 1$ y una señal de carga. En el momento $t_2$, $M = 1$, por lo que se genera una señal *Ad*. En el siguiente ciclo de reloj, la salida del sumador se carga en el acumulador y el control pasa a $S_2$. En $t_3$, se genera una señal *Sh*, por lo que se produce un desplazamiento y el contador se incrementa en el siguiente reloj. En $t_4$, *M* = 1, entonces $Ad = 1$, y la salida del sumador se carga en el acumulador en el siguiente ciclo de reloj. En $t_5$ y $t_6$, se produce el desplazamiento y el conteo. En $t_7$, se han producido tres desplazamientos y el estado del contador es 11, por lo que $K = 1$. Como *M* = 1, se produce la suma y el control pasa a $S_2$. En $t_8$, $Sh = K = 1$, por lo que en el siguiente reloj se produce el desplazamiento final y el contador se incrementa nuevamente al estado 00. En $t_9$, se genera una señal *Done* El diseño del multiplicador que se proporciona aquí se puede ampliar fácilmente a 8, 16 o más bits simplemente aumentando el tamaño del registro y el número de bits en el contador. El control de desplazamiento adicional permanecería sin cambios. -->
+</section>
+</section>
+</section>
+<section id="tarea" class="level1">
+<h1>Tarea</h1>
+<p>Escribir el código VHDL para un multiplicador secuencial de <em>n</em> bits. Deben seguir el diagrama de bloques <a href="#fig-diag_bloques_mult_secuencial">Figura&nbsp;1</a> teniendo en cuenta que el tamaño de los registros ahora será dependiente de <em>n</em>. El acumulador deberá ser de <span class="math inline">\((2 \times n) + 1\)</span> bits, el sumador de <em>n</em> bits, etc. La máquina de estados que realice el control de las operaciones deberá seguir el modelo dado en <a href="#fig-diagrama_controlador_factorizado">Figura&nbsp;4</a>.</p>
+<p>Para que el multiplicador sea parametrizable deberán usar <em>generics</em>, el mecanismo provisto por VHDL para crear modelos parametrizados. Deberán crear también un banco de prueba para verifcar el correcto funcionamiento de su implementación</p>
+<p>Junto a la presente guía se provee una implementación y banco de prueba para un multiplicador secuencial de 4 bits <em>no parametrizado</em>. Esta implementación puede servirles de punto de partida en su trabajo.</p>
+<p>La fecha de presentación de las implementaciones será el viernes <strong>17/11</strong> en el horario de clase. Si tuvieran dudas o inconvenientes realicen las onsultas pertinentes lo antes posible, dado que el tiempo disponible es muy ajustado.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copiado");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copiado");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

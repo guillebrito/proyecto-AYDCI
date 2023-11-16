@@ -1,0 +1,7 @@
+v 4
+file "/home/guille/Facultad/AYDCI/proyecto/ejemplo/" "src/mult_sec_4x4.vhd" "32b75f32c1213770cdcfa62a6997904cafe1e473" "20231116164117.087":
+  entity mult_sec_4x4 at 1( 0) + 0 on 11;
+  architecture comportamiento of mult_sec_4x4 at 12( 264) + 0 on 12;
+file "/home/guille/Facultad/AYDCI/proyecto/ejemplo/" "src/tb_mult_sec_4x4.vhd" "af6248b0c2264932204f490037c396e59b357170" "20231116164116.830":
+  entity testmultsec at 1( 0) + 0 on 4;
+  architecture test1 of testmultsec at 8( 182) + 0 on 4;

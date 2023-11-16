@@ -1,0 +1,7 @@
+v 4
+file . "./tb_mult_sec_4x4.vhd" "b07dddf593c654f3697f3aad0fbd62095d57cfe1" "20231115204535.074":
+  entity testmultsec at 1( 0) + 0 on 17;
+  architecture test1 of testmultsec at 8( 181) + 0 on 18;
+file . "./mult_sec_4x4.vhd" "6b04a7f1fe820b0d2cb322e5e7c6e3176f3b56bb" "20231115204528.469":
+  entity mult_sec_4x4 at 1( 0) + 0 on 15;
+  architecture comportamiento of mult_sec_4x4 at 12( 264) + 0 on 16;
