@@ -16,11 +16,11 @@ architecture test1 of mult_sec_nbits_tb is
           done: out std_logic);
   end component;
 
-  constant N_VAL: integer:= 6;
+  constant N_VAL: integer:= 4;
   constant M: integer:= 6;
   type arr is array(1 to M) of std_logic_vector(N_VAL-1 downto 0);
-  constant MCANDARR: arr:= ("110100", "101100", "000100", "100000", "111100", "110100");
-  constant MPLIERARR: arr:= ("101100", "110100", "000100", "100000", "111100","000000");
+  constant MCANDARR: arr:= ("1101", "1011", "0001", "1000", "1111", "1101");
+  constant MPLIERARR: arr:= ("1011", "1101", "0001", "1000", "1111","0000");
   signal clk: std_logic := '0';
   signal st, done: std_logic;
   signal mplier, mcand: std_logic_vector(N_VAL-1 downto 0);

@@ -16,7 +16,7 @@ end entity mult_sec_nbits;
 
 architecture comportamiento of mult_sec_nbits is
     signal estado_act, estado_sig: integer range 0 to 3;
-    signal contador: integer range 0 to N - 1;
+    signal cnt_act, cnt_sig: integer range 0 to (N-1);
     signal K, M: std_logic;
     signal acu_act, acu_sig: std_logic_vector((2 * N) downto 0);
     signal Load, Ad, Sh: std_logic;
@@ -32,31 +32,32 @@ begin
     process (clk)
     begin
         if clk'event and clk = '1' then
+            cnt_act <= cnt_sig;
             estado_act <= estado_sig;
-            acu_act <= acu_sig;
-            --contador <= contador;
+            acu_act <= acu_sig;     
         end if;
     end process;
 
     --les contador
-    process (contador, st, clk,K)
+    process (cnt_act, Sh, st, clk)
     begin
         if st = '1' then
-            contador <= 0;
+            cnt_sig <= 0;
             K <= '0';
         elsif clk'event and clk = '1' then
             if Sh = '1' then
-                if contador = (N - 2) then
+                if cnt_act = (N - 1) then
                     K <= '1';
+                    cnt_sig <= cnt_act;
                 else
-                    contador <= contador + 1;
+                    cnt_sig <= cnt_act + 1;
                 end if;
             end if;
         end if;
     end process;
 
     --les controlador
-    process (estado_act, st, M, K)
+    process (estado_act, st, M, K) -- k? M?
     begin
         -- Valores default
         Load <= '0';
@@ -99,7 +100,7 @@ begin
     process (Load, Sh, Ad, mplier, acu_act, suma)
     begin
         if Load = '1' then 
-            acu_sig <= ((2*N) downto 0 => '0');
+            acu_sig <= ((2*N) downto 0 => '0'); -- Posible error
             acu_sig(N-1 downto 0) <= mplier;
         elsif Ad = '1' then
             acu_sig <= suma & acu_act(N-1 downto 0);

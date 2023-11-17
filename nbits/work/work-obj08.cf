@@ -1,7 +1,7 @@
 v 4
-file "/home/guille/Facultad/AYDCI/proyecto/nbits/" "src/mult_sec_nbits.vhdl" "9a1762a828da8959c5174a619d692b0e36d4baf6" "20231116175909.196":
-  entity mult_sec_nbits at 1( 0) + 0 on 13;
-  architecture comportamiento of mult_sec_nbits at 17( 368) + 0 on 14;
-file "/home/guille/Facultad/AYDCI/proyecto/nbits/" "src/mult_sec_nbits_tb.vhdl" "a6d880ee4b5050c4bb1ec51ee83712c231dcfa22" "20231116175909.195":
+file "/home/guille/Facultad/AYDCI/proyecto/nbits/" "src/mult_sec_nbits_tb.vhdl" "a48521dadc3b367dfd5525cf8cdbb7d4bc3385e5" "20231117034835.967":
   entity mult_sec_nbits_tb at 1( 0) + 0 on 11;
   architecture test1 of mult_sec_nbits_tb at 8( 124) + 0 on 12;
+file "/home/guille/Facultad/AYDCI/proyecto/nbits/" "src/mult_sec_nbits.vhdl" "e39e9b7d89be87f525cbb587aeef138221300859" "20231117034835.967":
+  entity mult_sec_nbits at 1( 0) + 0 on 13;
+  architecture comportamiento of mult_sec_nbits at 17( 368) + 0 on 14;
