@@ -27,9 +27,14 @@ begin
     acu_suma <= acu_act((2 * N) - 1 downto N);
     product <= acu_act((2 * N) - 1 downto 0);
     suma <= std_logic_vector(('0' & unsigned(mcand)) + ('0' & unsigned(acu_suma)));
+   
+    --LES/LS contador 
     K <= '1' when (cnt_act = (N-1)) else '0';
+    cnt_sig <= 0 when (st = '1') else
+               (cnt_act + 1) when (Sh = '1' and K = '0') else
+               cnt_act;
 
-    --Memoria de estado y acumulador
+    --Memoria de estado, contador y acumulador
     process (clk)
     begin
         if clk'event and clk = '1' then
@@ -39,20 +44,8 @@ begin
         end if;
     end process;
 
-    --les contador
-    process (cnt_act, Sh, st, K)
-    begin
-        if st = '1'  then
-            cnt_sig <= 0;
-        elsif Sh = '1' and K = '0' then
-            cnt_sig <= cnt_act+1;
-        else
-            cnt_sig <= cnt_act;
-        end if;
-    end process;
-
-    --les controlador
-    process (estado_act, st, M, K) -- k? M?
+    --LES/LS controlador
+    process (estado_act, st, M, K)
     begin
         -- Valores default
         Load <= '0';
@@ -91,11 +84,11 @@ begin
         end case;
     end process;
 
-    --les acumulador
+    --LES/LS acumulador
     process (Load, Sh, Ad, mplier, acu_act, suma)
     begin
         if Load = '1' then 
-            acu_sig <= ((2*N) downto 0 => '0'); -- Posible error
+            acu_sig <= ((2*N) downto 0 => '0'); -- Puedo asignar dos señales dentro de un proceso, vale la utlima.
             acu_sig(N-1 downto 0) <= mplier;
         elsif Ad = '1' then
             acu_sig <= suma & acu_act(N-1 downto 0);
