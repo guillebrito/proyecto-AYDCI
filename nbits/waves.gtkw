@@ -1,0 +1,52 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Fri Nov 17 22:35:20 2023
+[*]
+[dumpfile] "/home/guille/Facultad/AYDCI/proyecto/nbits/wave/mult_sec_nbits_tb.ghw"
+[dumpfile_mtime] "Fri Nov 17 21:59:19 2023"
+[dumpfile_size] 4918
+[savefile] "/home/guille/Facultad/AYDCI/proyecto/nbits/waves.gtkw"
+[timestart] 0
+[size] 1312 704
+[pos] -38 -38
+*-25.926266 222800000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.mult_sec_nbits_tb.
+[sst_width] 48
+[signals_width] 262
+[sst_expanded] 0
+[sst_vpaned_height] 180
+@24
+top.mult_sec_nbits_tb.mult1.clk
+top.mult_sec_nbits_tb.mult1.st
+top.mult_sec_nbits_tb.mult1.done
+top.mult_sec_nbits_tb.mult1.load
+top.mult_sec_nbits_tb.mult1.ad
+top.mult_sec_nbits_tb.mult1.sh
+top.mult_sec_nbits_tb.mult1.k
+top.mult_sec_nbits_tb.mult1.m
+top.mult_sec_nbits_tb.mult1.cnt_act
+top.mult_sec_nbits_tb.mult1.cnt_sig
+top.mult_sec_nbits_tb.mult1.estado_act
+top.mult_sec_nbits_tb.mult1.estado_sig
+@28
+#{top.mult_sec_nbits_tb.mult1.acu_act[12:0]} top.mult_sec_nbits_tb.mult1.acu_act[12] top.mult_sec_nbits_tb.mult1.acu_act[11] top.mult_sec_nbits_tb.mult1.acu_act[10] top.mult_sec_nbits_tb.mult1.acu_act[9] top.mult_sec_nbits_tb.mult1.acu_act[8] top.mult_sec_nbits_tb.mult1.acu_act[7] top.mult_sec_nbits_tb.mult1.acu_act[6] top.mult_sec_nbits_tb.mult1.acu_act[5] top.mult_sec_nbits_tb.mult1.acu_act[4] top.mult_sec_nbits_tb.mult1.acu_act[3] top.mult_sec_nbits_tb.mult1.acu_act[2] top.mult_sec_nbits_tb.mult1.acu_act[1] top.mult_sec_nbits_tb.mult1.acu_act[0]
+#{top.mult_sec_nbits_tb.mult1.acu_sig[12:0]} top.mult_sec_nbits_tb.mult1.acu_sig[12] top.mult_sec_nbits_tb.mult1.acu_sig[11] top.mult_sec_nbits_tb.mult1.acu_sig[10] top.mult_sec_nbits_tb.mult1.acu_sig[9] top.mult_sec_nbits_tb.mult1.acu_sig[8] top.mult_sec_nbits_tb.mult1.acu_sig[7] top.mult_sec_nbits_tb.mult1.acu_sig[6] top.mult_sec_nbits_tb.mult1.acu_sig[5] top.mult_sec_nbits_tb.mult1.acu_sig[4] top.mult_sec_nbits_tb.mult1.acu_sig[3] top.mult_sec_nbits_tb.mult1.acu_sig[2] top.mult_sec_nbits_tb.mult1.acu_sig[1] top.mult_sec_nbits_tb.mult1.acu_sig[0]
+@c00028
+#{top.mult_sec_nbits_tb.mult1.acu_suma[5:0]} top.mult_sec_nbits_tb.mult1.acu_suma[5] top.mult_sec_nbits_tb.mult1.acu_suma[4] top.mult_sec_nbits_tb.mult1.acu_suma[3] top.mult_sec_nbits_tb.mult1.acu_suma[2] top.mult_sec_nbits_tb.mult1.acu_suma[1] top.mult_sec_nbits_tb.mult1.acu_suma[0]
+@28
+top.mult_sec_nbits_tb.mult1.acu_suma[5]
+top.mult_sec_nbits_tb.mult1.acu_suma[4]
+top.mult_sec_nbits_tb.mult1.acu_suma[3]
+top.mult_sec_nbits_tb.mult1.acu_suma[2]
+top.mult_sec_nbits_tb.mult1.acu_suma[1]
+top.mult_sec_nbits_tb.mult1.acu_suma[0]
+@1401208
+-group_end
+@28
+#{top.mult_sec_nbits_tb.mult1.suma[6:0]} top.mult_sec_nbits_tb.mult1.suma[6] top.mult_sec_nbits_tb.mult1.suma[5] top.mult_sec_nbits_tb.mult1.suma[4] top.mult_sec_nbits_tb.mult1.suma[3] top.mult_sec_nbits_tb.mult1.suma[2] top.mult_sec_nbits_tb.mult1.suma[1] top.mult_sec_nbits_tb.mult1.suma[0]
+#{top.mult_sec_nbits_tb.mult1.mcand[5:0]} top.mult_sec_nbits_tb.mult1.mcand[5] top.mult_sec_nbits_tb.mult1.mcand[4] top.mult_sec_nbits_tb.mult1.mcand[3] top.mult_sec_nbits_tb.mult1.mcand[2] top.mult_sec_nbits_tb.mult1.mcand[1] top.mult_sec_nbits_tb.mult1.mcand[0]
+#{top.mult_sec_nbits_tb.mult1.mplier[5:0]} top.mult_sec_nbits_tb.mult1.mplier[5] top.mult_sec_nbits_tb.mult1.mplier[4] top.mult_sec_nbits_tb.mult1.mplier[3] top.mult_sec_nbits_tb.mult1.mplier[2] top.mult_sec_nbits_tb.mult1.mplier[1] top.mult_sec_nbits_tb.mult1.mplier[0]
+#{top.mult_sec_nbits_tb.mult1.product[11:0]} top.mult_sec_nbits_tb.mult1.product[11] top.mult_sec_nbits_tb.mult1.product[10] top.mult_sec_nbits_tb.mult1.product[9] top.mult_sec_nbits_tb.mult1.product[8] top.mult_sec_nbits_tb.mult1.product[7] top.mult_sec_nbits_tb.mult1.product[6] top.mult_sec_nbits_tb.mult1.product[5] top.mult_sec_nbits_tb.mult1.product[4] top.mult_sec_nbits_tb.mult1.product[3] top.mult_sec_nbits_tb.mult1.product[2] top.mult_sec_nbits_tb.mult1.product[1] top.mult_sec_nbits_tb.mult1.product[0]
+[pattern_trace] 1
+[pattern_trace] 0
