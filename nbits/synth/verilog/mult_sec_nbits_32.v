@@ -1,39 +1,39 @@
 module mult_sec_nbits
   (input  clk,
    input  st,
-   input  [3:0] mplier,
-   input  [3:0] mcand,
+   input  [31:0] mplier,
+   input  [31:0] mcand,
    output done,
-   output [7:0] product);
+   output [63:0] product);
   wire [1:0] estado_act;
   wire [1:0] estado_sig;
-  wire [2:0] cnt_act;
-  wire [2:0] cnt_sig;
+  wire [5:0] cnt_act;
+  wire [5:0] cnt_sig;
   wire k;
   wire m;
-  wire [8:0] acu_act;
-  wire [8:0] acu_sig;
+  wire [64:0] acu_act;
+  wire [64:0] acu_sig;
   wire load;
   wire ad;
   wire sh;
-  wire [4:0] suma;
-  wire [3:0] acu_suma;
+  wire [32:0] suma;
+  wire [31:0] acu_suma;
   wire n2_o;
-  wire [3:0] n3_o;
-  wire [7:0] n4_o;
-  wire [4:0] n6_o;
-  wire [4:0] n8_o;
-  wire [4:0] n9_o;
+  wire [31:0] n3_o;
+  wire [63:0] n4_o;
+  wire [32:0] n6_o;
+  wire [32:0] n8_o;
+  wire [32:0] n9_o;
   wire [31:0] n11_o;
   wire n13_o;
   wire n14_o;
-  wire [2:0] n17_o;
+  wire [5:0] n17_o;
   wire [31:0] n18_o;
   wire [31:0] n20_o;
-  wire [2:0] n21_o;
+  wire [5:0] n21_o;
   wire n22_o;
   wire n23_o;
-  wire [2:0] n24_o;
+  wire [5:0] n24_o;
   wire [1:0] n35_o;
   wire n38_o;
   wire n40_o;
@@ -61,19 +61,19 @@ module mult_sec_nbits
   reg n85_o;
   reg n89_o;
   reg n94_o;
-  localparam [8:0] n99_o = 9'b000000000;
-  wire [4:0] n100_o;
-  wire [3:0] n101_o;
-  wire [8:0] n102_o;
-  wire [7:0] n103_o;
-  wire [8:0] n105_o;
-  wire [8:0] n106_o;
-  wire [8:0] n107_o;
-  wire [8:0] n108_o;
-  wire [8:0] n109_o;
+  localparam [64:0] n99_o = 65'b00000000000000000000000000000000000000000000000000000000000000000;
+  wire [32:0] n100_o;
+  wire [31:0] n101_o;
+  wire [64:0] n102_o;
+  wire [63:0] n103_o;
+  wire [64:0] n105_o;
+  wire [64:0] n106_o;
+  wire [64:0] n107_o;
+  wire [64:0] n108_o;
+  wire [64:0] n109_o;
   reg [1:0] n111_q;
-  reg [2:0] n112_q;
-  reg [8:0] n113_q;
+  reg [5:0] n112_q;
+  reg [64:0] n113_q;
   assign done = n78_o;
   assign product = n4_o;
   /* src/mult_sec_nbits.vhdl:18:12  */
@@ -105,9 +105,9 @@ module mult_sec_nbits
   /* src/mult_sec_nbits.vhdl:26:17  */
   assign n2_o = acu_act[0];
   /* src/mult_sec_nbits.vhdl:27:24  */
-  assign n3_o = acu_act[7:4];
+  assign n3_o = acu_act[63:32];
   /* src/mult_sec_nbits.vhdl:28:23  */
-  assign n4_o = acu_act[7:0];
+  assign n4_o = acu_act[63:0];
   /* src/mult_sec_nbits.vhdl:29:35  */
   assign n6_o = {1'b0, mcand};
   /* src/mult_sec_nbits.vhdl:29:61  */
@@ -115,19 +115,19 @@ module mult_sec_nbits
   /* src/mult_sec_nbits.vhdl:29:54  */
   assign n9_o = n6_o + n8_o;
   /* src/mult_sec_nbits.vhdl:32:28  */
-  assign n11_o = {29'b0, cnt_act};  //  uext
+  assign n11_o = {26'b0, cnt_act};  //  uext
   /* src/mult_sec_nbits.vhdl:32:28  */
-  assign n13_o = n11_o == 32'b00000000000000000000000000000011;
+  assign n13_o = n11_o == 32'b00000000000000000000000000011111;
   /* src/mult_sec_nbits.vhdl:32:14  */
   assign n14_o = n13_o ? 1'b1 : 1'b0;
   /* src/mult_sec_nbits.vhdl:33:18  */
-  assign n17_o = st ? 3'b000 : n24_o;
+  assign n17_o = st ? 6'b000000 : n24_o;
   /* src/mult_sec_nbits.vhdl:34:25  */
-  assign n18_o = {29'b0, cnt_act};  //  uext
+  assign n18_o = {26'b0, cnt_act};  //  uext
   /* src/mult_sec_nbits.vhdl:34:25  */
   assign n20_o = n18_o + 32'b00000000000000000000000000000001;
   /* src/mult_sec_nbits.vhdl:34:16  */
-  assign n21_o = n20_o[2:0];  // trunc
+  assign n21_o = n20_o[5:0];  // trunc
   /* src/mult_sec_nbits.vhdl:34:51  */
   assign n22_o = ~k;
   /* src/mult_sec_nbits.vhdl:34:45  */
@@ -222,13 +222,13 @@ module mult_sec_nbits
       4'b0001: n94_o = 1'b0;
       default: n94_o = 1'bX;
     endcase
-  assign n100_o = n99_o[8:4];
+  assign n100_o = n99_o[64:32];
   /* src/mult_sec_nbits.vhdl:94:38  */
-  assign n101_o = acu_act[3:0];
+  assign n101_o = acu_act[31:0];
   /* src/mult_sec_nbits.vhdl:94:29  */
   assign n102_o = {suma, n101_o};
   /* src/mult_sec_nbits.vhdl:96:37  */
-  assign n103_o = acu_act[8:1];
+  assign n103_o = acu_act[64:1];
   /* src/mult_sec_nbits.vhdl:96:28  */
   assign n105_o = {1'b0, n103_o};
   /* src/mult_sec_nbits.vhdl:95:9  */

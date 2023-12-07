@@ -1,4 +1,7 @@
 v 4
-file "/home/facundo/aydci/proyecto-AYDCI/nbits/" "src/mult_sec_nbits.vhdl" "22c948d6988f5cad1576cf7c0f66337c6baecd6f" "20231204031209.876":
+file "/home/facundo/aydci/proyecto-AYDCI/nbits/" "src/mult_sec_nbits.vhdl" "f5dd7dd025b0fdf3b8dd3cb650365eab741551c9" "20231207033821.034":
   entity mult_sec_nbits at 1( 0) + 0 on 11;
   architecture comportamiento of mult_sec_nbits at 17( 368) + 0 on 12;
+file "/home/facundo/aydci/proyecto-AYDCI/nbits/" "src/mult_sec_nbits_tb.vhdl" "5ef7f66e558dc9e98f5b1223cf81c432663850f4" "20231207033820.825":
+  entity mult_sec_nbits_tb at 1( 0) + 0 on 4;
+  architecture test1 of mult_sec_nbits_tb at 8( 124) + 0 on 4;

@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 entity mult_sec_nbits is
     generic (
-        N : integer := 4 
+        N : integer := 32
     );
     port (
         clk, st: in std_logic;
