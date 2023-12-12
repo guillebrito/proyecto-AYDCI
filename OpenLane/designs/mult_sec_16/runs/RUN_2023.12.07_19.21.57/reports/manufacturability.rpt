@@ -1,0 +1,19 @@
+Design Name: mult_sec_16
+Run Directory: /openlane/designs/mult_sec_16/runs/RUN_2023.12.07_19.21.57
+----------------------------------------
+
+Magic DRC Summary:
+Source: /openlane/designs/mult_sec_16/runs/RUN_2023.12.07_19.21.57/reports/signoff/drc.rpt
+Total Magic DRC violations is 0
+----------------------------------------
+
+LVS Summary:
+Source: /openlane/designs/mult_sec_16/runs/RUN_2023.12.07_19.21.57/logs/signoff/38-mult_sec_16.lef.lvs.log
+Number of nets: 409                        |Number of nets: 409                        
+Design is LVS clean.
+----------------------------------------
+
+Antenna Summary:
+Source: /openlane/designs/mult_sec_16/runs/RUN_2023.12.07_19.21.57/logs/signoff/40-arc.log
+Pin violations: 0
+Net violations: 0

@@ -1,0 +1,6 @@
+%Warning-UNUSEDSIGNAL: /openlane/designs/mult_sec_16/src/mult_sec_16.v:32:15: Bits of signal are not used: 'n20_o'[31:5]
+                                                                            : ... In instance mult_sec_16
+   32 |   wire [31:0] n20_o;
+      |               ^~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.009
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.

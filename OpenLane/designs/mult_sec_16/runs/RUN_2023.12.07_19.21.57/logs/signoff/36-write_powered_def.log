@@ -1,0 +1,21 @@
+OpenROAD 0a6d0fd469bc674417036342994520ee2e0a2727 
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+[INFO ODB-0222] Reading LEF file: /openlane/designs/mult_sec_16/runs/RUN_2023.12.07_19.21.57/tmp/merged.nom.lef
+[INFO ODB-0223]     Created 13 technology layers
+[INFO ODB-0224]     Created 25 technology vias
+[INFO ODB-0225]     Created 442 library cells
+[INFO ODB-0226] Finished LEF file:  /openlane/designs/mult_sec_16/runs/RUN_2023.12.07_19.21.57/tmp/merged.nom.lef
+[INFO ODB-0127] Reading DEF file: /openlane/designs/mult_sec_16/runs/RUN_2023.12.07_19.21.57/results/routing/mult_sec_16.def
+[INFO ODB-0128] Design: mult_sec_16
+[INFO ODB-0130]     Created 69 pins.
+[INFO ODB-0131]     Created 837 components and 4338 component-terminals.
+[INFO ODB-0132]     Created 2 special nets and 3204 connections.
+[INFO ODB-0133]     Created 407 nets and 1134 connections.
+[INFO ODB-0134] Finished DEF file: /openlane/designs/mult_sec_16/runs/RUN_2023.12.07_19.21.57/results/routing/mult_sec_16.def
+Top-level design name: mult_sec_16
+Found default power net 'VPWR'
+Found default ground net 'VGND'
+Found 1 power ports.
+Found 1 ground ports.
+Modified power connections of 837/837 cells.

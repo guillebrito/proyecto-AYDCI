@@ -1,0 +1,44 @@
+[WARNING STA-0337] port 'clk' not found.
+[WARNING STA-0337] port 'clk' not found.
+[WARNING STA-0559] transition time can not be specified for virtual clocks.
+[WARNING GRT-0026] Missing route to pin _2344_/Y.
+[WARNING GRT-0026] Missing route to pin _2387_/A.
+[WARNING GRT-0026] Missing route to pin _2415_/B.
+[WARNING GRT-0026] Missing route to pin _2385_/X.
+[WARNING GRT-0026] Missing route to pin _2386_/Y.
+[WARNING GRT-0026] Missing route to pin _2457_/A.
+[WARNING GRT-0026] Missing route to pin _2457_/B.
+[WARNING GRT-0026] Missing route to pin _2747_/A.
+[WARNING GRT-0026] Missing route to pin _2747_/Y.
+[WARNING GRT-0026] Missing route to pin _2758_/Y.
+[WARNING GRT-0026] Missing route to pin _1495_/Y.
+[WARNING GRT-0026] Missing route to pin _1579_/A1.
+[WARNING GRT-0026] Missing route to pin _1559_/A2.
+[WARNING GRT-0026] Missing route to pin _1579_/A2.
+[WARNING GRT-0026] Missing route to pin _1557_/A.
+[WARNING GRT-0026] Missing route to pin _1550_/A.
+[WARNING GRT-0026] Missing route to pin _1550_/Y.
+[WARNING GRT-0026] Missing route to pin _1639_/C.
+[WARNING GRT-0026] Missing route to pin _1579_/Y.
+[WARNING GRT-0026] Missing route to pin _1639_/B.
+[WARNING GRT-0026] Missing route to pin _2175_/B2.
+[WARNING GRT-0026] Missing route to pin _1639_/X.
+[WARNING GRT-0026] Missing route to pin _1843_/A.
+[WARNING GRT-0026] Missing route to pin _1794_/A.
+[WARNING GRT-0026] Missing route to pin _1776_/X.
+[WARNING GRT-0026] Missing route to pin _1794_/B.
+[WARNING GRT-0026] Missing route to pin _1829_/C.
+[WARNING GRT-0026] Missing route to pin _1833_/B.
+[WARNING GRT-0026] Missing route to pin _1833_/Y.
+[WARNING GRT-0026] Missing route to pin _1839_/A.
+[WARNING GRT-0026] Missing route to pin _1839_/B.
+[WARNING GRT-0026] Missing route to pin _1839_/Y.
+[WARNING GRT-0026] Missing route to pin _1980_/X.
+[WARNING GRT-0026] Missing route to pin _1440_/B.
+[WARNING GRT-0026] Missing route to pin _2173_/B.
+[WARNING GRT-0026] Missing route to pin _2173_/Y.
+[WARNING GRT-0026] Missing route to pin output33/X.
+[WARNING GRT-0026] Missing route to pin clone1/A.
+[WARNING GRT-0026] Missing route to pin _1580_/A.
+[WARNING GRT-0026] Missing route to pin output33/A.
+[WARNING] Did not save OpenROAD database!

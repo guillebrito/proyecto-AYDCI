@@ -1,0 +1,19 @@
+Design Name: mult_sec_32
+Run Directory: /openlane/designs/mult_sec_32/runs/RUN_2023.12.07_19.26.18
+----------------------------------------
+
+Magic DRC Summary:
+Source: /openlane/designs/mult_sec_32/runs/RUN_2023.12.07_19.26.18/reports/signoff/drc.rpt
+Total Magic DRC violations is 0
+----------------------------------------
+
+LVS Summary:
+Source: /openlane/designs/mult_sec_32/runs/RUN_2023.12.07_19.26.18/logs/signoff/38-mult_sec_32.lef.lvs.log
+Number of nets: 761                        |Number of nets: 761                        
+Design is LVS clean.
+----------------------------------------
+
+Antenna Summary:
+Source: /openlane/designs/mult_sec_32/runs/RUN_2023.12.07_19.26.18/logs/signoff/40-arc.log
+Pin violations: 1
+Net violations: 1
